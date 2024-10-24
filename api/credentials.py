@@ -3,11 +3,15 @@ import json
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
 import base64
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class MpesaC2bCredential:
-    consumer_key = '3cRuGb3W62GWUgxu6vcsjjLLYAdUhIdRRqhDjtoAnXPTqpDP'
-    consumer_secret = 'Ry1WvTAQ7ZTzchFZLSFfmpYV2UOVg0mnp5yaASciooOUtqLMsvr1y9jl3wXAh2GL'
+    consumer_key = os.getenv('consumer_key')
+    consumer_secret = os.getenv('consumer_secret')
     api_URL = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
 
 
