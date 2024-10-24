@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken
 from .models import *
 from .forms import *
+from .credentials import *
 
 @api_view(['POST'])
 def register_view(request):
@@ -104,5 +105,57 @@ def product_detail(request, slug):
     serialiser = ProductSerializer(product)
     return Response(serialiser.data)
 
+@api_view(['POST', 'GET'])
+def mpesa_view(request, slug):
+    try: 
+        product = Product.objects.get(slug=slug)
+    except  Product.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    
+    if request.method == 'GET':
+        serialiser = ProductSerializer(product)
+        product_data = serialiser.data
+        product_data['price'] = float(product_data['price'])
+        return Response(product_data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'POST':
+        phone = request.data.get('phone')
+
+        if not phone:
+            return Response({"error": "Phone number is required"}, status=status.HTTP_400_BAD_REQUEST)
+        amount = product.price
+
+        access_token = MpesaAccessToken.validated_mpesa_access_token
+        api_url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
+        headers = {"Authorization": "Bearer %s" % access_token}
+
+        payment_request = {
+            "BusinessShortCode": LipanaMpesaPassword.Business_short_code,
+            "Password": LipanaMpesaPassword.decode_password,
+            "Timestamp": LipanaMpesaPassword.lipa_time,
+            "TransactionType": "CustomerPayBillOnline",
+            "Amount": float(amount),
+            "PartyA": phone,
+            "PartyB": LipanaMpesaPassword.Business_short_code,
+            "PhoneNumber": phone,
+            "CallBackURL": "https://sandbox.safaricom.co.ke/mpesa/",
+            "AccountReference": "PYMENT001",
+            "TransactionDesc": "Product Payment"
+        }
+
+        response = requests.post(api_url, json=payment_request, headers=headers)
+        
+        # Print the response for debugging
+        print("Response Status Code:", response.status_code)
+        print("Response Text:", response.text)
+
+        if response.status_code == 200:
+            # Payment initiated successfully
+            return Response({"success": "Payment Initiated"}, status=status.HTTP_200_OK)
+        else:
+            # Handle payment failure or errors here
+            return Response({"error": "Payment has failed"},status=status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 

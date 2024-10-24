@@ -70,8 +70,10 @@ class LogoutSerilizer(serializers.Serializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Product
         fields = ('id', 'name', 'description', 'price', 'image', 'slug')
+
 
 
