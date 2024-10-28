@@ -10,8 +10,8 @@ load_dotenv()
 
 
 class MpesaC2bCredential:
-    consumer_key = os.getenv('consumer_key')
-    consumer_secret = os.getenv('consumer_secret')
+    consumer_key = os.getenv('MPESA_CONSUMER_KEY')
+    consumer_secret = os.getenv('MPESA_CONSUMER_SECRET')
     api_URL = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
 
 

@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken, OutstandingToken
 from .models import *
 from .forms import *
 from .credentials import *
+from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
 def register_view(request):
@@ -46,6 +47,22 @@ def logout_view(request):
             return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     print(request.data)
     return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'POST'])
+def customUserProfile(request, username):
+    user = get_object_or_404(CustomUser, username=username)
+    if request.method == 'GET':
+        serialiser = ProfileSerializer(user)
+        return Response(serialiser.data, status=status.HTTP_200_OK)
+    
+    elif request.method == 'POST':
+        serialiser = ProfileSerializer(user, data=request.data)
+        if serialiser.is_valid():
+            serialiser.save()
+            return Response({"success": "Profile updated"}, status=status.HTTP_201_CREATED)
+        return Response(serialiser.errors,status=status.HTTP_400_BAD_REQUEST)
+        
 
 
 @api_view(['GET']) # View to display product retrived from database
