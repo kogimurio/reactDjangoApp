@@ -161,13 +161,14 @@ import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
+ 
+from decouple import config
 
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587 
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'kogimurio@gmail.com'
-EMAIL_HOST_PASSWORD = 'hadrlzujmdfwwwgu'
-DEFAULT_FROM_EMAIL = 'kogimurio@gmail.com'
+EMAIL_BACKEND = config('DJANGO_EMAIL_BACKEND')
+EMAIL_HOST = config('DJANGO_EMAIL_HOST')
+EMAIL_PORT = config('DJANGO_EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('DJANGO_EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('DJANGO_EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('DJANGO_EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DJANGO_DEFAULT_FROM_EMAIL')
 
