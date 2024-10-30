@@ -57,16 +57,6 @@ class LoginSerializer(serializers.Serializer):
         
         data['user'] = user
         return data
-    
-class LogoutSerilizer(serializers.Serializer):
-    refresh = serializers.CharField(required=True)
-
-    def validate(self, data):
-        refresh_token = data.get('refresh')
-
-        if not refresh_token:
-            raise serializers.ValidationError('Refresh Token is required')
-        return data
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -79,5 +69,19 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['first_name', 'last_name', 'username', 'description', 'phone_number', 'email']
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        if not CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email does not exist")
+        return value
+    
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_new_password(self, value):
+        return value
 
 
