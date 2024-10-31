@@ -1,6 +1,5 @@
 from django.urls import path
 from .import views
-from .views import PasswordResetRequestView, PasswordResetConfirmView
 
 
 urlpatterns = [
@@ -13,7 +12,7 @@ urlpatterns = [
     path('product_delete/<slug:slug>/', views.product_delete, name='productDelete'),
     path('product_detail/<slug:slug>/', views.product_detail, name='productDetail'),
     path('mpesa_payment/<slug:slug>/', views.mpesa_view, name='mpesa'),
-    path('password-reset/', PasswordResetRequestView.as_view(), name='password-reset'),
-    path('password-reset-confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
-    path('password-reset-email/', views.password_reset_email, name='password_reset_email'),
+    path('password-reset/', views.PasswordResetRequestView, name='password-reset'),
+    path('password-reset-confirm/<uidb64>/<token>/', views.PasswordResetConfirmView, name='password-reset-confirm'),
+    path('password-change/', views.passwordChangeView, name='password-change'),
 ]

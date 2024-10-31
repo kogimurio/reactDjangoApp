@@ -80,8 +80,33 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     
 class PasswordResetConfirmSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password2 = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, data):
+        if data['new_password']!= data['new_password2']:
+            raise serializers.ValidationError("Passwords must match")
+        return data
 
     def validate_new_password(self, value):
         return value
 
+class PasswordChangeSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password2 = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, data):
+        if data['new_password'] != data['new_password2']:
+            raise serializers.ValidationError("Password Must Match")
+        return data
+    def validate_current_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Incorrect Current Password")
+        return value
+    
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
 
